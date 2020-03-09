@@ -1,0 +1,24 @@
+{
+  "name": "backlog-notifier",
+  "version": "1.0.0",
+  "description": "Comment on tickets connected to PRs in a teams platform specific repository in the same account about the release of a new PR / feature.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blackjacx/backlog-notifier.git"
+  },
+  "author": "Stefan Herold",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Blackjacx/backlog-notifier/issues"
+  },
+  "homepage": "https://github.com/Blackjacx/backlog-notifier#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.3",
+    "@actions/github": "^2.1.1",
+    "changelog-parser": "^2.8.0"
+  }
+}

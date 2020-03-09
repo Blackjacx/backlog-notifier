@@ -1,0 +1,18 @@
+name: 'Backlog Notifier'
+description: 'Comment on tickets connected to PRs in a teams platform specific repository in the same account about the release of a new PR / feature.'
+inputs:
+  backlog-ticket-template:
+    description: 'Prefix of the backlog issue identifier. The whole identifier must look like `BACKLOG-539` and has to be part of the PR description.'
+    required: true
+    default: 'BACKLOG'
+  backlog-repo-name:
+    description: 'The repo name that contains your backlog tickets. Must be under the same github account as the repo you use this action in.'
+    required: true
+    default: 'backlog'
+  message: 
+    description: 'The message thats posted in the backlog ticket. Use `#` as placeholder for the version number.'
+    required: true
+    default: 'This feature has just been released for iOS 🎉 Now it takes typically 2-3 days until the release is available in the App Store.'
+runs:
+  using: 'node12'
+  main: 'index.js'
