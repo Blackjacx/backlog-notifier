@@ -1,7 +1,7 @@
 name: 'Backlog Notifier'
 description: 'Comment on tickets connected to PRs in a teams platform specific repository in the same account about the release of a new PR / feature.'
 inputs:
-  backlog-ticket-template:
+  backlog-ticket-prefix:
     description: 'Prefix of the backlog issue identifier. The whole identifier must look like `BACKLOG-539` and has to be part of the PR description.'
     required: true
     default: 'BACKLOG'

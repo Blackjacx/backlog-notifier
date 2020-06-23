@@ -21,7 +21,7 @@ Comment on tickets connected to PRs in a teams platform specific repository in t
 ```
 uses: blackjacx/backlog-notifier@master
 with:
-  backlog-ticket-template: 'BACKLOG'
+  backlog-ticket-prefix: 'BACKLOG'
   backlog-repo-name: 'backlog'
   message: 'Dang! This feature is released in version # 🎉'
 ```
