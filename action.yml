@@ -1,5 +1,5 @@
 name: 'Backlog Notifier'
-description: 'Comment on tickets connected to PRs in a teams platform specific repository in the same account about the release of a new PR / feature.'
+description: 'Automatically comments on tickets connected to your PRs when they get released and included the version.'
 inputs:
   reference-repo-prefixes:
     description: 'Prefixes for issue numbers of reference repos. You can specify multiple comma-separated ones. The should be single words like BACKLOG or BUGLOG which could identify repos for backlog and bug tickets respectively. A complete identifier, as the action searches it in the PR description, should consist of this prefix and the issue number separated by a dash, e.g. `BACKLOG-539`.'
