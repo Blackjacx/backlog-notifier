@@ -77,13 +77,13 @@ async function run() {
         let matches = pr.body.match(expression)
 
         if (matches == null) {
-          console.log(`🔴 No issue references found for "${prefix}" on PR "${pr.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
+          console.log(`🟡 No issue references found for "${prefix}" on PR "${pr.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
           continue
         }
 
         for (const match of matches) {
           issueReferenceID = match.match(/[0-9]+/g)[0]
-          console.log(`➡️ Issue reference found: ${match}`)
+          console.log(`🟢 Issue reference found: ${match}`)
 
           const comment = await createComment(owner, repoName, issueReferenceID, message)
           console.log('🟢 Comment created:\n%O', comment)
