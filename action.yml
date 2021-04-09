@@ -12,7 +12,7 @@ inputs:
   message:
     description: 'The message that is posted in the backlog ticket. Use `#` as placeholder for the version number.'
     required: true
-    default: 'This feature has just been released for iOS 🎉 Now it takes typically 2-3 days until the release is available in the App Store.'
+    default: 'Dang! This feature has just been released in version # 🎉'
 branding:
   icon: 'bell'  
   color: 'green'

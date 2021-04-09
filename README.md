@@ -12,7 +12,7 @@ Of course this can also be used if you have a simpler setup than the one describ
 
 For PRs that resolve multiple issues this action is also capable of detecting each reference and comment on all of the connected tickets.
 
-The only thing this action relies on is that you maintain a CHANGELOG.md file following the format described on [Keep A Changelog](https://keepachangelog.com/).
+The only thing this action relies on is that you maintain a CHANGELOG.md file following the format described on [Keep A Changelog](https://keepachangelog.com/). This good practice anyways, so win-win!
 
 ## Inputs
 
@@ -26,7 +26,7 @@ Repository names that contain tickets to notify. This list must have the same nu
 
 #### `message` • required
 
-The message thats posted in the backlog ticket. Use `#` as placeholder for the version number. It will be automatically replaced. Default `"This feature has just been released for iOS 🎉 Now it takes typically 2-3 days until the release is available in the App Store."`.
+The message thats posted in the backlog ticket. Use `#` as placeholder for the version number. It will be automatically replaced. Default `"Dang! This feature has just been released in version # 🎉"`.
 
 ## Example Usage
 
