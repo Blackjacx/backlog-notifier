@@ -12,7 +12,11 @@ inputs:
   message:
     description: 'The message that is posted in the backlog ticket. Use `#` as placeholder for the version number.'
     required: true
-    default: 'Dang! This feature has just been released in version # 🎉'
+    default: 'Dang! This feature has just been released in version # 🎉'
+  changelog-path:
+    description: 'The path to the CHANGELOG.md file. Defaults to CHANGELOG.md'
+    required: false
+    default: 'CHANGELOG.md'
 branding:
   icon: 'bell'  
   color: 'green'

@@ -39,6 +39,7 @@ async function run() {
     const referenceRepoNames = Array.from(new Set(core.getInput('reference-repo-names').split(',').map(string => string.trim())))
     const referenceRepoPrefixes = Array.from(new Set(core.getInput('reference-repo-prefixes').split(',').map(string => string.trim())))
     const message = core.getInput('message').replace('#', `[${tag}](${tagUrl})`);
+    const changelogPath = core.getInput('changelog-path');
 
     console.log(`➡️ tag: ${tag}`);
     console.log(`➡️ tagUrl: ${tagUrl}`);
@@ -54,7 +55,7 @@ async function run() {
     if (!`${payload.ref}`.startsWith('refs/tags/'))
       throw Error('🔴 The trigger for this action was not a tag reference!');
 
-    const changelog = await parseChangelog('CHANGELOG.md')
+    const changelog = await parseChangelog(changelogPath)
     console.log('➡️ Changelog:\n%O', changelog);
 
     const filteredChangelog = changelog.versions.filter(function(obj) {
