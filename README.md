@@ -26,7 +26,11 @@ Repository names that contain tickets to notify. This list must have the same nu
 
 #### `message` • required
 
-The message thats posted in the backlog ticket. Use `#` as placeholder for the version number. It will be automatically replaced. Default `"Dang! This feature has just been released in version # 🎉"`.
+The message thats posted in the backlog ticket. Use `#` as placeholder for the version number. It will be automatically replaced. **Default:** `"Dang! This feature has just been released in version # 🎉"`.
+
+#### `changelog-path` • optional
+
+An optional path to your changelog file. **Default:** `CHANGELOG.md`.
 
 ## Example Usage
 
@@ -38,6 +42,7 @@ with:
   reference-repo-prefixes: 'BACKLOG, BUG'
   reference-repo-names: 'backlog, bug'
   message: 'Dang! This feature is released in version # 🎉'
+  changelog-path: 'changelog/CHANGELOG.md' # This is optional
 ```
 
 ## Testing
