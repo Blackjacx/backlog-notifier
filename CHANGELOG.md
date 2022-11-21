@@ -1,4 +1,7 @@
-# Change Log
+# Changelog
+
+## [1.2.0] - 2022-11-21
+* [#9](https://github.com/Blackjacx/backlog-notifier/pull/9): Support dynamic changelog path - [@StefMa](https://github.com/StefMa).
 
 ## [1.1.2] - 2021-04-09
 * Update icons for console messages
