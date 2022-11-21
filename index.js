@@ -46,8 +46,10 @@ async function run() {
     console.log(`➡️ owner: ${owner}`);
     console.log(`➡️ referenceRepoNames: ${referenceRepoNames} (${referenceRepoNames.length})`);
     console.log(`➡️ referenceRepoPrefixes: ${referenceRepoPrefixes} (${referenceRepoPrefixes.length})`);
+    console.log(`➡️ changelogPath: ${changelogPath}`);
     console.log(`➡️ message: ${message}`);
     console.log(`➡️ The event payload: ${JSON.stringify(payload, undefined, 2)})`);
+
 
     if (referenceRepoNames.length != referenceRepoPrefixes.length)
       throw Error('🔴 Different count in arrays "reference-repo-names" and "reference-repo-prefixes" Please specify same length. Repo names and repo prefixed must match.');
