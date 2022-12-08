@@ -1,5 +1,8 @@
 # Changelog
 
+## [Unreleased]
+* [#10](https://github.com/Blackjacx/backlog-notifier/pull/10): Upgrade dependencies - [@Blackjacx](https://github.com/blackjacx).
+
 ## [1.2.0] - 2022-11-21
 * [#9](https://github.com/Blackjacx/backlog-notifier/pull/9): Support dynamic changelog path - [@StefMa](https://github.com/StefMa).
 
