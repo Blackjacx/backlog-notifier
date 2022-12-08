@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [1.2.1] - 2022-12-08
 * [#10](https://github.com/Blackjacx/backlog-notifier/pull/10): Upgrade dependencies - [@Blackjacx](https://github.com/blackjacx).
 
 ## [1.2.0] - 2022-11-21
