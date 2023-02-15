@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+* [#16](https://github.com/Blackjacx/backlog-notifier/pull/16): Convert from JS -> TS - [@Blackjacx](https://github.com/blackjacx).
 
 ## [1.2.2] - 2022-12-16
 * [#14](https://github.com/Blackjacx/backlog-notifier/pull/14): Update to node 16 - [@Blackjacx](https://github.com/blackjacx).
