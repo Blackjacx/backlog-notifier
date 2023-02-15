@@ -47,7 +47,7 @@ with:
 
 ## Testing
 
-I didn't find a way to properly test the JS action implementation in `index.js` locally yet. That's why I created the repos [Backlog](https://github.com/Blackjacx/backlog) and [GHTest](https://github.com/Blackjacx/ghtest). 
+I didn't find a way to properly test the action implementation in `index.ts` locally yet. That's why I created the repos [Backlog](https://github.com/Blackjacx/backlog) and [GHTest](https://github.com/Blackjacx/ghtest). 
 
 Backlog is just setup with some issues where the action can comment on and which can be referenced from PRs in different repos.
 
