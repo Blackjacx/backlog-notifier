@@ -2,32 +2,34 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const parseChangelog = require('changelog-parser');
 
-async function getIssue(owner, repo, id) {
-  const octokit = github.getOctokit(`${process.env.GITHUB_TOKEN}`)
+async function getIssue(owner, repo, issue_number, oktokit) {
+  console.log(`➡️ Fetching issue with ID: ${issue_number}`)
 
-  const { data: issue } = await octokit.issues.get({
-    owner: `${owner}`,
-    repo: `${repo}`,
-    issue_number: `${id}`
+  const { data: issueData } = await octokit.rest.issues.get({
+    owner,
+    repo,
+    issue_number,
   });
-  return issue
+  
+  console.log(`➡️ Issue:\n${JSON.stringify(issueData)}`)
+  return issueData
 }
 
-async function createComment(owner, repo, id, message) {  
-  const octokit = github.getOctokit(`${process.env.GITHUB_TOKEN}`)
+async function createComment(owner, repo, issue_number, body, oktokit) {  
+  console.log(`➡️ Creating comment for issue ${owner}/${repo}/issues/${issue_number}`)
 
-  console.log(`➡️ Creating comment for issue ${owner}/${repo}/issues/${id}`)
-
-  const { data: comment } = await octokit.issues.createComment({
-    owner: `${owner}`,
-    repo: `${repo}`,
-    issue_number: `${id}`,
-    body: `${message}`
+  const { data: comment } = await octokit.rest.issues.createComment({
+    owner,
+    repo,
+    issue_number,
+    body
   });
   return comment
 }
 
 async function run() {
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
+
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = github.context.payload;
 
@@ -58,29 +60,28 @@ async function run() {
       throw Error('🔴 The trigger for this action was not a tag reference!');
 
     const changelog = await parseChangelog(changelogPath)
-    console.log('➡️ Changelog:\n%O', changelog);
+    console.log(`➡️ Changelog:\n${changelog}`);
 
     const filteredChangelog = changelog.versions.filter(function(obj) {
       return obj.version === `${tag}`;
     });  
     console.log(`➡️ Filtered Changelog:\n${filteredChangelog[0].body}`);
 
-    prIds = filteredChangelog[0].body.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, '').split('\n');
-    uniquePrIds = Array.from(new Set(prIds))
-    console.log('➡️ Unique PR IDs:\n%O', uniquePrIds)
+    issueIds = filteredChangelog[0].body.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, '').split('\n');
+    uniqueIssueIds = Array.from(new Set(issueIds))
+    console.log(`➡️ Unique issue IDs:\n${uniqueIssueIds}`)
 
-    for (const id of uniquePrIds) {
-      const pr = await getIssue(owner, repo, id)
-      console.log('➡️ Pull Request:\n%O', pr)
+    for (const id of uniqueIssueIds) {
+      const issueData = await getIssue(owner, repo, id, octokit)
 
       for (const [i, prefix] of referenceRepoPrefixes.entries()) {
         const repoName = referenceRepoNames[i]
 
         let expression = new RegExp(`${prefix}-[0-9]+`, 'g')
-        let matches = pr.body.match(expression)
+        let matches = issueData.body.match(expression)
 
         if (matches == null) {
-          console.log(`🟡 No issue references found for "${prefix}" on PR "${pr.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
+          console.log(`🟡 No issue references found for "${prefix}" on PR "${issueData.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
           continue
         }
 
@@ -88,20 +89,17 @@ async function run() {
           issueReferenceID = match.match(/[0-9]+/g)[0]
           console.log(`🟢 Issue reference found: ${match}`)
 
-          const comment = await createComment(owner, repoName, issueReferenceID, message)
-          console.log('🟢 Comment created:\n%O', comment)
+          const comment = await createComment(owner, repoName, issueReferenceID, message, octokit)
+          console.log(`🟢 Comment created:\n${comment}`)
         }
       }
     }
   }
 
-  try {
-    run().then(function (result) {
-      console.log('🟢  Done 🎉')
-    }).catch(function (err) {
+  run().then(function (result) {
+    console.log('🟢  Done 🎉')
+  }).catch(function (error) {
     // Whoops, something went wrong!
-    console.error(`🔴 ${err}`);
-  })  
-  } catch (error) {
+    console.error(`🔴 ${error}`);
     core.setFailed(error.message)
-  }
+  })  
