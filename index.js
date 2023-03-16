@@ -2,29 +2,33 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const parseChangelog = require('changelog-parser');
 
-async function getIssue(owner, repo, issue_number, oktokit) {
-  console.log(`➡️ Fetching issue with ID: ${issue_number}`)
+async function getIssue(owner, repo, issue_number, octokit) {
+  console.log(`🟢 Fetching issue with ID: ${issue_number}`)
 
   const { data: issueData } = await octokit.rest.issues.get({
     owner,
     repo,
     issue_number,
   });
+
+  console.log(`🟢 Issue:\n${JSON.stringify(issueData)}`)
   
-  console.log(`➡️ Issue:\n${JSON.stringify(issueData)}`)
   return issueData
 }
 
-async function createComment(owner, repo, issue_number, body, oktokit) {  
-  console.log(`➡️ Creating comment for issue ${owner}/${repo}/issues/${issue_number}`)
+async function createComment(owner, repo, issue_number, body, octokit) {  
+  console.log(`🟢 Creating comment for issue ${owner}/${repo}/issues/${issue_number}`)
 
-  const { data: comment } = await octokit.rest.issues.createComment({
+  const { data: commentData } = await octokit.rest.issues.createComment({
     owner,
     repo,
     issue_number,
     body
   });
-  return comment
+
+  console.log(`🟢 Comment created:\n${JSON.stringify(commentData)}`)
+
+  return commentData
 }
 
 async function run() {
@@ -43,14 +47,14 @@ async function run() {
     const message = core.getInput('message').replace('#', `[${tag}](${tagUrl})`);
     const changelogPath = core.getInput('changelog-path');
 
-    console.log(`➡️ tag: ${tag}`);
-    console.log(`➡️ tagUrl: ${tagUrl}`);
-    console.log(`➡️ owner: ${owner}`);
-    console.log(`➡️ referenceRepoNames: ${referenceRepoNames} (${referenceRepoNames.length})`);
-    console.log(`➡️ referenceRepoPrefixes: ${referenceRepoPrefixes} (${referenceRepoPrefixes.length})`);
-    console.log(`➡️ changelogPath: ${changelogPath}`);
-    console.log(`➡️ message: ${message}`);
-    console.log(`➡️ The event payload: ${JSON.stringify(payload, undefined, 2)})`);
+    console.log(`🟢 tag: ${tag}`);
+    console.log(`🟢 tagUrl: ${tagUrl}`);
+    console.log(`🟢 owner: ${owner}`);
+    console.log(`🟢 referenceRepoNames: ${referenceRepoNames} (${referenceRepoNames.length})`);
+    console.log(`🟢 referenceRepoPrefixes: ${referenceRepoPrefixes} (${referenceRepoPrefixes.length})`);
+    console.log(`🟢 changelogPath: ${changelogPath}`);
+    console.log(`🟢 message: ${message}`);
+    console.log(`🟢 The event payload: ${JSON.stringify(payload)})`);
 
 
     if (referenceRepoNames.length != referenceRepoPrefixes.length)
@@ -60,16 +64,16 @@ async function run() {
       throw Error('🔴 The trigger for this action was not a tag reference!');
 
     const changelog = await parseChangelog(changelogPath)
-    console.log(`➡️ Changelog:\n${changelog}`);
+    console.log(`🟢 Changelog:\n${changelog}`);
 
     const filteredChangelog = changelog.versions.filter(function(obj) {
       return obj.version === `${tag}`;
     });  
-    console.log(`➡️ Filtered Changelog:\n${filteredChangelog[0].body}`);
+    console.log(`🟢 Filtered Changelog:\n${filteredChangelog[0].body}`);
 
     issueIds = filteredChangelog[0].body.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, '').split('\n');
     uniqueIssueIds = Array.from(new Set(issueIds))
-    console.log(`➡️ Unique issue IDs:\n${uniqueIssueIds}`)
+    console.log(`🟢 Unique issue IDs:\n${uniqueIssueIds}`)
 
     for (const id of uniqueIssueIds) {
       const issueData = await getIssue(owner, repo, id, octokit)
@@ -90,16 +94,16 @@ async function run() {
           console.log(`🟢 Issue reference found: ${match}`)
 
           const comment = await createComment(owner, repoName, issueReferenceID, message, octokit)
-          console.log(`🟢 Comment created:\n${comment}`)
         }
       }
     }
   }
 
-  run().then(function (result) {
-    console.log('🟢  Done 🎉')
-  }).catch(function (error) {
-    // Whoops, something went wrong!
-    console.error(`🔴 ${error}`);
-    core.setFailed(error.message)
-  })  
+  run()
+    .then(result => {
+      console.log('🟢  Done 🎉');
+    })
+    .catch(error => {
+      console.error(`🔴 Error: ${error.message}`);
+      core.setFailed(`Action failed with error: ${error.message}`);
+    });
