@@ -1,6 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+
+## [1.2.5] - 2023-09-21
+* [#22](https://github.com/Blackjacx/backlog-notifier/pull/22): Upgrade to Node 20 - [@Blackjacx](https://github.com/blackjacx).
+
+## [1.2.4] - 2023-09-21
 * [#21](https://github.com/Blackjacx/backlog-notifier/pull/21): Improve error reporting and code documentation - [@Blackjacx](https://github.com/blackjacx).
 
 ## [1.2.2] - 2022-12-16
