@@ -54,7 +54,7 @@ async function run() {
     console.log(`🟢 referenceRepoPrefixes: ${referenceRepoPrefixes} (${referenceRepoPrefixes.length})`);
     console.log(`🟢 changelogPath: ${changelogPath}`);
     console.log(`🟢 message: ${message}`);
-    console.log(`🟢 The event payload: ${JSON.stringify(payload)})`);
+    console.log(`🟢 The event payload: ${JSON.stringify(payload, null, '\t')})`);
 
 
     if (referenceRepoNames.length != referenceRepoPrefixes.length)
@@ -63,17 +63,32 @@ async function run() {
     if (!`${payload.ref}`.startsWith('refs/tags/'))
       throw Error('🔴 The trigger for this action was not a tag reference!');
 
+    // Parse the changelog file to JSON format
+
     const changelog = await parseChangelog(changelogPath)
-    console.log(`🟢 Changelog:\n${changelog}`);
+    console.log(`🟢 Changelog: \n${JSON.stringify(changelog, null, '\t')}`);
+
+    if (changelog.versions.length == 0)
+      throw Error('🔴 The changelog does not contain any versions');
+
+    // Filter changelog for `tag`
 
     const filteredChangelog = changelog.versions.filter(function(obj) {
       return obj.version === `${tag}`;
-    });  
-    console.log(`🟢 Filtered Changelog:\n${filteredChangelog[0].body}`);
+    });    
+
+    if (filteredChangelog.length == 0)
+      throw Error(`🔴 The tag "${tag}" was not found among the sections of the changelog file.`);
+    
+    console.log(`🟢 Filtered Changelog: \n${filteredChangelog[0].body}`);
+
+    // Extract the ID of each pull requst in the changelog section
 
     issueIds = filteredChangelog[0].body.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, '').split('\n');
     uniqueIssueIds = Array.from(new Set(issueIds))
-    console.log(`🟢 Unique issue IDs:\n${uniqueIssueIds}`)
+    console.log(`🟢 Unique issue IDs: \n${uniqueIssueIds}`)
+
+    // Parse the pull request descriptions for issue references
 
     for (const id of uniqueIssueIds) {
       const issueData = await getIssue(owner, repo, id, octokit)
@@ -88,6 +103,8 @@ async function run() {
           console.log(`🟡 No issue references found for "${prefix}" on PR "${issueData.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
           continue
         }
+
+        // Create a comment in (notify) each matching issue about the release
 
         for (const match of matches) {
           issueReferenceID = match.match(/[0-9]+/g)[0]
