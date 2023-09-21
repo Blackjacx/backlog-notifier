@@ -56,11 +56,13 @@ Backlog is just setup with some issues where the action can comment on and which
 
 GHTest contains a [shell script](https://github.com/Blackjacx/ghtest/blob/develop/trigger-backlog-notifier.sh) that can trigger this action. It will essentially push a tag to GitHub, i.e. create a release which is the main use case where this action should run. After executing the script this [GHTest workflow](https://github.com/Blackjacx/ghtest/blob/develop/.github/workflows/backlog-notifier.yml) is used to run the action on GitHub. It is configured to detect ticket references for both repos, `Backlog` and `GHTest`.
 
+After you made a change to `index.js` you have to run `npm run build` to re-create the main `index.js` file in `./dist/`.
+
 ## Releasing
 
 To release the backlog notifier do the following:
 - In `CHANGELOG.md` tag the release and move all PRs from unreleased to the new tag you'll create
-- Update the version in `package.json` and run `npm upgrade`
+- Update the version in `package.json` by running the tool `npm-upgrade` (install using `npm i -g npm-upgrade`)
 - Update `./dist/index.js` by running `npm run build` (https://github.com/actions/typescript-action/issues/4#issuecomment-525019468)
 - On GitHub draft a new release and specify to create the new tag
 - Commit using the message `Release version <tag>`
