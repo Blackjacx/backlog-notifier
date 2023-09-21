@@ -493,7 +493,7 @@ async function run() {
     console.log(`🟢 referenceRepoPrefixes: ${referenceRepoPrefixes} (${referenceRepoPrefixes.length})`);
     console.log(`🟢 changelogPath: ${changelogPath}`);
     console.log(`🟢 message: ${message}`);
-    console.log(`🟢 The event payload: ${JSON.stringify(payload)})`);
+    console.log(`🟢 The event payload: ${JSON.stringify(payload, null, '\t')})`);
 
 
     if (referenceRepoNames.length != referenceRepoPrefixes.length)
@@ -502,17 +502,32 @@ async function run() {
     if (!`${payload.ref}`.startsWith('refs/tags/'))
       throw Error('🔴 The trigger for this action was not a tag reference!');
 
+    // Parse the changelog file to JSON format
+
     const changelog = await parseChangelog(changelogPath)
-    console.log(`🟢 Changelog:\n${changelog}`);
+    console.log(`🟢 Changelog: \n${JSON.stringify(changelog, null, '\t')}`);
+
+    if (changelog.versions.length == 0)
+      throw Error('🔴 The changelog does not contain any versions');
+
+    // Filter changelog for `tag`
 
     const filteredChangelog = changelog.versions.filter(function(obj) {
       return obj.version === `${tag}`;
-    });  
-    console.log(`🟢 Filtered Changelog:\n${filteredChangelog[0].body}`);
+    });    
+
+    if (filteredChangelog.length == 0)
+      throw Error(`🔴 The tag "${tag}" was not found among the sections of the changelog file.`);
+    
+    console.log(`🟢 Filtered Changelog: \n${filteredChangelog[0].body}`);
+
+    // Extract the ID of each pull requst in the changelog section
 
     issueIds = filteredChangelog[0].body.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, '').split('\n');
     uniqueIssueIds = Array.from(new Set(issueIds))
-    console.log(`🟢 Unique issue IDs:\n${uniqueIssueIds}`)
+    console.log(`🟢 Unique issue IDs: \n${uniqueIssueIds}`)
+
+    // Parse the pull request descriptions for issue references
 
     for (const id of uniqueIssueIds) {
       const issueData = await getIssue(owner, repo, id, octokit)
@@ -527,6 +542,8 @@ async function run() {
           console.log(`🟡 No issue references found for "${prefix}" on PR "${issueData.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
           continue
         }
+
+        // Create a comment in (notify) each matching issue about the release
 
         for (const match of matches) {
           issueReferenceID = match.match(/[0-9]+/g)[0]
@@ -940,7 +957,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -1340,11 +1363,15 @@ module.exports = function(md, options) {
   options.listUnicodeChar = options.hasOwnProperty('listUnicodeChar') ? options.listUnicodeChar : false;
   options.stripListLeaders = options.hasOwnProperty('stripListLeaders') ? options.stripListLeaders : true;
   options.gfm = options.hasOwnProperty('gfm') ? options.gfm : true;
+  options.useImgAltText = options.hasOwnProperty('useImgAltText') ? options.useImgAltText : true;
+  options.abbr = options.hasOwnProperty('abbr') ? options.abbr : false;
+  options.replaceLinksWithURL = options.hasOwnProperty('replaceLinksWithURL') ? options.replaceLinksWithURL : false;
+  options.htmlTagsToSkip = options.hasOwnProperty('htmlTagsToSkip') ? options.htmlTagsToSkip : [];
 
   var output = md || '';
 
   // Remove horizontal rules (stripListHeaders conflict with this rule, which is why it has been moved to the top)
-  output = output.replace(/^(-\s*?|\*\s*?|_\s*?){3,}\s*$/gm, '');
+  output = output.replace(/^(-\s*?|\*\s*?|_\s*?){3,}\s*/gm, '');
 
   try {
     if (options.stripListLeaders) {
@@ -1355,40 +1382,72 @@ module.exports = function(md, options) {
     }
     if (options.gfm) {
       output = output
-        // Header
+      // Header
         .replace(/\n={2,}/g, '\n')
+        // Fenced codeblocks
+        .replace(/~{3}.*\n/g, '')
         // Strikethrough
         .replace(/~~/g, '')
         // Fenced codeblocks
         .replace(/`{3}.*\n/g, '');
     }
+    if (options.abbr) {
+      // Remove abbreviations
+      output = output.replace(/\*\[.*\]:.*\n/, '');
+    }
+    output = output
+    // Remove HTML tags
+      .replace(/<[^>]*>/g, '')
+
+    var htmlReplaceRegex = new RegExp('<[^>]*>', 'g');
+    if (options.htmlTagsToSkip.length > 0) {
+      // Using negative lookahead. Eg. (?!sup|sub) will not match 'sup' and 'sub' tags.
+      var joinedHtmlTagsToSkip = '(?!' + options.htmlTagsToSkip.join("|") + ')';
+
+      // Adding the lookahead literal with the default regex for html. Eg./<(?!sup|sub)[^>]*>/ig
+      htmlReplaceRegex = new RegExp(
+          '<' +
+          joinedHtmlTagsToSkip +
+          '[^>]*>', 
+          'ig'
+      );
+    }
+
     output = output
       // Remove HTML tags
-      .replace(/<[^>]*>/g, '')
+      .replace(htmlReplaceRegex, '')
       // Remove setext-style headers
       .replace(/^[=\-]{2,}\s*$/g, '')
       // Remove footnotes?
       .replace(/\[\^.+?\](\: .*?$)?/g, '')
       .replace(/\s{0,2}\[.*?\]: .*?$/g, '')
       // Remove images
-      .replace(/\!\[.*?\][\[\(].*?[\]\)]/g, '')
+      .replace(/\!\[(.*?)\][\[\(].*?[\]\)]/g, options.useImgAltText ? '$1' : '')
       // Remove inline links
-      .replace(/\[(.*?)\][\[\(].*?[\]\)]/g, '$1')
+      .replace(/\[([^\]]*?)\][\[\(].*?[\]\)]/g, options.replaceLinksWithURL ? '$2' : '$1')
       // Remove blockquotes
-      .replace(/^\s{0,3}>\s?/g, '')
+      .replace(/^\s{0,3}>\s?/gm, '')
+      // .replace(/(^|\n)\s{0,3}>\s?/g, '\n\n')
       // Remove reference-style links?
       .replace(/^\s{1,2}\[(.*?)\]: (\S+)( ".*?")?\s*$/g, '')
       // Remove atx-style headers
-      .replace(/^(\n)?\s{0,}#{1,6}\s+| {0,}(\n)?\s{0,}#{0,} {0,}(\n)?\s{0,}$/gm, '$1$2$3')
-      // Remove emphasis (repeat the line to remove double emphasis)
-      .replace(/([\*_]{1,3})(\S.*?\S{0,1})\1/g, '$2')
-      .replace(/([\*_]{1,3})(\S.*?\S{0,1})\1/g, '$2')
+      .replace(/^(\n)?\s{0,}#{1,6}\s+| {0,}(\n)?\s{0,}#{0,} #{0,}(\n)?\s{0,}$/gm, '$1$2$3')
+      // Remove * emphasis
+      .replace(/([\*]+)(\S)(.*?\S)??\1/g, '$2$3')
+      // Remove _ emphasis. Unlike *, _ emphasis gets rendered only if 
+      //   1. Either there is a whitespace character before opening _ and after closing _.
+      //   2. Or _ is at the start/end of the string.
+      .replace(/(^|\W)([_]+)(\S)(.*?\S)??\2($|\W)/g, '$1$3$4$5')
       // Remove code blocks
       .replace(/(`{3,})(.*?)\1/gm, '$2')
       // Remove inline code
       .replace(/`(.+?)`/g, '$1')
-      // Replace two or more newlines with exactly two? Not entirely sure this belongs here...
-      .replace(/\n{2,}/g, '\n\n');
+      // // Replace two or more newlines with exactly two? Not entirely sure this belongs here...
+      // .replace(/\n{2,}/g, '\n\n')
+      // // Remove newlines in a paragraph
+      // .replace(/(\S+)\n\s*(\S+)/g, '$1 $2')
+      // Replace strike through
+      .replace(/~(.*?)~/g, '$1');
   } catch(e) {
     console.error(e);
     return md;
@@ -2389,6 +2448,19 @@ class HttpClientResponse {
                 });
                 this.message.on('end', () => {
                     resolve(output.toString());
+                });
+            }));
+        });
+    }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
                 });
             }));
         });
@@ -4711,10 +4783,6 @@ function getNodeRequestOptions(request) {
 		agent = agent(parsedURL);
 	}
 
-	if (!headers.has('Connection') && !agent) {
-		headers.set('Connection', 'close');
-	}
-
 	// HTTP-network fetch step 4.2
 	// chunked encoding is handled by Node.js
 
@@ -5088,8 +5156,11 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 
 		if (headers['transfer-encoding'] === 'chunked' && !headers['content-length']) {
 			response.once('close', function (hadError) {
+				// tests for socket presence, as in some situations the
+				// the 'socket' event is not triggered for the request
+				// (happens in deno), avoids `TypeError`
 				// if a data listener is still present we didn't end cleanly
-				const hasDataListener = socket.listenerCount('data') > 0;
+				const hasDataListener = socket && socket.listenerCount('data') > 0;
 
 				if (hasDataListener && !hadError) {
 					const err = new Error('Premature close');
@@ -5131,6 +5202,7 @@ exports.Headers = Headers;
 exports.Request = Request;
 exports.Response = Response;
 exports.FetchError = FetchError;
+exports.AbortError = AbortError;
 
 
 /***/ }),
@@ -6619,7 +6691,7 @@ const removeMarkdown = __webpack_require__(228)
 
 // patterns
 const semver = /\[?v?([\w\d.-]+\.[\w\d.-]+[a-zA-Z0-9])\]?/
-const date = /.*[ ](\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d?).*/
+const date = /.*[ ]\(?(\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d?)\)?.*/
 const subhead = /^###/
 const listitem = /^[*-]/
 
@@ -6868,7 +6940,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
