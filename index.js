@@ -2,6 +2,11 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const parseChangelog = require('changelog-parser');
 
+// Print satck trace on warning/error
+process.on('warning', (warning) => {
+    console.log(warning.stack);
+});
+
 async function getIssue(owner, repo, issue_number, octokit) {
   console.log(`🟢 Fetching issue with ID: ${issue_number}`)
 

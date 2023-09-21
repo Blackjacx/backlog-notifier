@@ -1,6 +1,6 @@
 {
   "name": "backlog-notifier",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Comment on tickets connected to PRs in a teams platform specific repository in the same account about the release of a new PR / feature.",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,6 @@
     "changelog-parser": "^3.0.1"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.3"
+    "@vercel/ncc": "^0.38.0"
   }
 }
