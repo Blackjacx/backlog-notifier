@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+* [#21](https://github.com/Blackjacx/backlog-notifier/pull/21): Improve error reporting and code documentation - [@Blackjacx](https://github.com/blackjacx).
 
 ## [1.2.2] - 2022-12-16
 * [#14](https://github.com/Blackjacx/backlog-notifier/pull/14): Update to node 16 - [@Blackjacx](https://github.com/blackjacx).
