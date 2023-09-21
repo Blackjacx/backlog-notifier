@@ -62,10 +62,11 @@ After you made a change to `index.js` you have to run `npm run build` to re-crea
 
 To release the backlog notifier do the following:
 - In `CHANGELOG.md` tag the release and move all PRs from unreleased to the new tag you'll create
-- Update the version in `package.json` by running the tool `npm-upgrade` (install using `npm i -g npm-upgrade`)
+- Update version in `package.json`
+- Update all dependencies in `package.json` by running `npm-upgrade` (install: `npm i -g npm-upgrade`)
 - Update `./dist/index.js` by running `npm run build` (https://github.com/actions/typescript-action/issues/4#issuecomment-525019468)
-- On GitHub [draft a new release](https://github.com/Blackjacx/backlog-notifier/releases/new) and specify to create the new tag
 - Commit using the message `Release version <tag>`
+- On GitHub [draft a new release](https://github.com/Blackjacx/backlog-notifier/releases/new) and specify to create the new tag
 
 ## License
 
