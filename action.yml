@@ -1,14 +1,15 @@
 name: 'Backlog Notifier'
 description: 'Automatically comments on tickets connected to your PRs, with the release version, when they get released.'
 inputs:
-  reference-repo-prefixes:
-    description: 'Prefixes for issue numbers of reference repos. You can specify multiple comma-separated ones. The should be single words like BACKLOG or BUGLOG which could identify repos for backlog and bug tickets respectively. A complete identifier, as the action searches it in the PR description, should consist of this prefix and the issue number separated by a dash, e.g. `BACKLOG-539`.'
+  repo-references:
+    description: 'Unique, human readable (1) identifiers and (2) repository names in JSON format. (1) are used as prefixes for issue numbers in PR description bodies. (2) The names of the linked repositories. Both are specified as list of associated arrays. You can specify as many ID/repo combinations as you want. The identifiers should be single words, like BACKLOG or BUGLOG which e.g. could identify repos for backlog and bug tickets. The ID, as the action searches it in the PR description, should be the prefix of the issue number. Prefix and the issue number must be separated by a dash, e.g. `BACKLOG-539`.'
     required: true
-    default: 'BACKLOG'
-  reference-repo-names:
-    description: 'Repository names that contain tickets to notify. This list must have the same number of elements as the repository prefixes list. Specify one repository name for each prefix. The repository must be located under the same GitHub account as the repository you use this action on.'
-    required: true
-    default: 'backlog'
+    default: |
+      {
+        "data": [
+          {"repo_id": "BACKLOG", "repo_name": "backlog"}
+        ]
+      }
   message:
     description: 'The message that is posted in the backlog ticket. Use `#` as placeholder for the version number.'
     required: true

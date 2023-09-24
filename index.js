@@ -47,23 +47,22 @@ async function run() {
     const owner = `${payload.repository.owner.login}`;
     const repo = `${payload.repository.name}`;
 
-    const referenceRepoNames = Array.from(new Set(core.getInput('reference-repo-names').split(',').map(string => string.trim())))
-    const referenceRepoPrefixes = Array.from(new Set(core.getInput('reference-repo-prefixes').split(',').map(string => string.trim())))
+    // Parse JSON inputs and trim string values
+
+    const repoReferences = JSON.parse(core.getInput('repo-references'), (key, value) => {
+        return typeof value === "string" ? value.trim() : value;
+    })
+
     const message = core.getInput('message').replace('#', `[${tag}](${tagUrl})`);
     const changelogPath = core.getInput('changelog-path');
 
     console.log(`🟢 tag: ${tag}`);
     console.log(`🟢 tagUrl: ${tagUrl}`);
     console.log(`🟢 owner: ${owner}`);
-    console.log(`🟢 referenceRepoNames: ${referenceRepoNames} (${referenceRepoNames.length})`);
-    console.log(`🟢 referenceRepoPrefixes: ${referenceRepoPrefixes} (${referenceRepoPrefixes.length})`);
+    console.log(`🟢 Repo References: ${JSON.stringify(repoReferences.data, null, '\t')}`);
     console.log(`🟢 changelogPath: ${changelogPath}`);
     console.log(`🟢 message: ${message}`);
-    console.log(`🟢 The event payload: ${JSON.stringify(payload, null, '\t')})`);
-
-
-    if (referenceRepoNames.length != referenceRepoPrefixes.length)
-      throw Error('🔴 Different count in arrays "reference-repo-names" and "reference-repo-prefixes" Please specify same length. Repo names and repo prefixed must match.');
+    console.log(`🟢 The event payload: ${JSON.stringify(payload, null, '\t')}`);
 
     if (!`${payload.ref}`.startsWith('refs/tags/'))
       throw Error('🔴 The trigger for this action was not a tag reference!');
@@ -98,14 +97,15 @@ async function run() {
     for (const id of uniqueIssueIds) {
       const issueData = await getIssue(owner, repo, id, octokit)
 
-      for (const [i, prefix] of referenceRepoPrefixes.entries()) {
-        const repoName = referenceRepoNames[i]
+      for (const reference of repoReferences.data) {
+        let repoID = reference.repo_id
+        let repoName = reference.repo_name
 
-        let expression = new RegExp(`${prefix}-[0-9]+`, 'g')
+        let expression = new RegExp(`${repoID}-[0-9]+`, 'g')
         let matches = issueData.body.match(expression)
 
         if (matches == null) {
-          console.log(`🟡 No issue references found for "${prefix}" on PR "${issueData.html_url}". Please specify them using the pattern "${prefix}-<number>"`)
+          console.log(`🟡 No issue references found for "${repoID}" on PR "${issueData.html_url}". Please specify them using the pattern "${repoID}-<number>"`)
           continue
         }
 
