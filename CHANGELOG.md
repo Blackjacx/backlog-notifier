@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+* [#24](https://github.com/Blackjacx/backlog-notifier/pull/24): Use JSON to represent repo references - [@Blackjacx](https://github.com/blackjacx).
 
 ## [1.2.5] - 2023-09-21
 * [#22](https://github.com/Blackjacx/backlog-notifier/pull/22): Upgrade to Node 20 - [@Blackjacx](https://github.com/blackjacx).
