@@ -90,7 +90,7 @@ async function run() {
 
     issueIds = filteredChangelog[0].body.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, '').split('\n');
     uniqueIssueIds = Array.from(new Set(issueIds))
-    console.log(`🟢 Unique issue IDs: \n${uniqueIssueIds}`)
+    console.log(`🟢 Unique issue IDs: ${uniqueIssueIds}`)
 
     // Parse the pull request descriptions for issue references
 
