@@ -12,12 +12,28 @@ inputs:
       }
   message:
     description: 'The message that is posted in the backlog ticket. Use `#` as placeholder for the version number.'
-    required: true
-    default: 'Dang! This feature has just been released in version # 🎉'
+    required: false
+    default: 'Dang! This feature has just been released in version # for  🚀'
   changelog-path:
     description: 'The path to the CHANGELOG.md file. Defaults to CHANGELOG.md'
     required: false
     default: 'CHANGELOG.md'
+  action: 
+    description: 'The action performed by this GitHub Action. Possible values are `notify` and `move`. Notify is the default and creates comments on tickets. Move can move an issue to a new lane on a GitHub Issues board.'
+    required: false
+    default: 'notify'
+  project-number:
+    description: 'The number of the project where the issue should be moved.'
+    required: false
+    default: 1
+  updating-field:
+    description: 'The name of the field that should be updated. It is not restricted to Status. You can update any "single selection field", e.g. the custom field "Priority".'
+    required: false
+    default: 'Status'
+  new-field-value:
+    description: 'The value the respecting field should be updated to.'
+    required: false
+    default: 'Done'
 branding:
   icon: 'bell'  
   color: 'green'
