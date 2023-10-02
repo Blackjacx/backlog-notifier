@@ -36,11 +36,7 @@ async function run() {
         console.log(`🟢 Action: ${action}`)
         console.log(`🟢 Owner: ${owner}`)
         console.log(
-            `🟢 Repo References: ${JSON.stringify(
-                repoReferences.data,
-                null,
-                '\t'
-            )}`
+            `🟢 Repo References: ${JSON.stringify(repoReferences, null, '\t')}`
         )
         console.log(`🟢 Event Context: ${JSON.stringify(context)}`)
         core.endGroup()
@@ -96,23 +92,26 @@ async function runActionNotify(context, owner, repoReferences, octokit) {
 
     // Filter changelog section for given `tag`
 
-    const filteredChangelog = changelog.versions.filter(function (obj) {
+    const taggedChangelogSection = changelog.versions.filter(function (obj) {
         return obj.version === `${tag}`
     })
 
-    if (filteredChangelog.length === 0)
+    if (taggedChangelogSection.length === 0) {
         throw Error(
             `🔴 The tag "${tag}" was not found among the sections of the changelog file.`
         )
-
-    console.log(`🟢 Filtered Changelog: \n${filteredChangelog[0].body}`)
+    }
+    console.log(
+        `🟢 Tagged Changelog Section: \n${taggedChangelogSection[0].body}`
+    )
 
     // Extract the ID of each pull requst in the changelog section
 
-    const prIds = filteredChangelog[0].body
-        .replace(/\* \[#/gi, '')
-        .replace(/\]\(https.*/gi, '')
-        .split('\n')
+    // Saved regex: https://regex101.com/r/7kjABI/1
+    const prIds = taggedChangelogSection[0].body
+        .match(/^\* \[#[0-9]*\].*/gim)
+        .map(line => line.replace(/\* \[#/gi, '').replace(/\]\(https.*/gi, ''))
+
     const uniquePrIds = Array.from(new Set(prIds))
     console.log(`🟢 Unique pull reuqest IDs: ${uniquePrIds}`)
 
