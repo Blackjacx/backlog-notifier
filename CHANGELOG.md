@@ -1,8 +1,12 @@
 # Changelog
 
 ## [Unreleased]
+
+## [1.4.0] - 2023-10-19
 * [#31](https://github.com/Blackjacx/backlog-notifier/pull/31): Exclude changelog entries not matching PR reference - [@Blackjacx](https://github.com/blackjacx).
 * [#29](https://github.com/Blackjacx/backlog-notifier/pull/29): Add New Function to Move Referenced Issue - [@Blackjacx](https://github.com/blackjacx).
+
+## [1.3.0] - 2023-09-26
 * [#24](https://github.com/Blackjacx/backlog-notifier/pull/24): Use JSON to represent repo references - [@Blackjacx](https://github.com/blackjacx).
 
 ## [1.2.5] - 2023-09-21
