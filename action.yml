@@ -34,6 +34,10 @@ inputs:
     description: 'The value the respecting field should be updated to.'
     required: false
     default: 'Done'
+  gh-token:
+    description: 'The GitHub token used to authenticate with the GitHub API. Defaults to ${{ secrets.GITHUB_TOKEN }}.'
+    required: false
+    default: '${{ secrets.GITHUB_TOKEN }}'
 branding:
   icon: 'bell'  
   color: 'green'

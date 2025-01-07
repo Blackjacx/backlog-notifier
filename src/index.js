@@ -14,7 +14,7 @@ process.on('warning', warning => {
 
 async function run() {
     try {
-        const token = process.env.GITHUB_TOKEN
+        const token = core.getInput('gh-token')
         const octokit = github.getOctokit(token)
 
         // Get the JSON webhook context for the event that triggered the workflow
