@@ -287,3 +287,4 @@ function logGrouped(title, message) {
 }
 
 run()
+module.exports = { run }
