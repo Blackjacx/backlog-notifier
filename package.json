@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.4",
-    "@babel/eslint-parser": "^7.23.10",
+    "@babel/eslint-parser": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@vercel/ncc": "^0.38.1",
     "babel-preset-jest": "^30.0.1",
