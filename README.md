@@ -59,8 +59,32 @@ After you made any change to `index.js` you have to run `npm run all` to re-crea
 
 To release the backlog notifier do the following:
 - In `CHANGELOG.md` tag the release and move all PRs from unreleased to the new tag you'll create
-- Update version in `package.json`
-- Update all dependencies in `package.json` by running `npm-upgrade` (install: `npm i -g npm-upgrade`)
+- Update `version` in `package.json`
+- Update NPM dependencies
+  1. Check what's outdated
+  ```shell
+  npm outdated
+  ```
+  2. Update everything (respects semver ranges)
+  ```shell
+  npm update
+  ```
+  3. Update package.json to latest versions
+  ```shell
+  npx npm-check-updates -u
+  ```
+  4. Install with updated versions
+  ```shell
+  npm install
+  ```
+  5. Test your app
+  ```shell
+  npm test
+  ```
+  6. If issues, check peer dependencies
+  ```shell
+  npm ls
+  ```
 - Package the application using `npm run all`
 - Commit using the message `Release version <tag>`
 - On GitHub [draft a new release](https://github.com/Blackjacx/backlog-notifier/releases/new) and specify to create the new tag
