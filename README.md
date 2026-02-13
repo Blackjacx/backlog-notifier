@@ -65,23 +65,27 @@ To release the backlog notifier do the following:
   ```shell
   npm outdated
   ```
-  2. Update all the packages listed to the latest version (specified by the \fBtag\fR config ⟨/using-npm/config#tag⟩), respecting the semver constraints of both your package and its dependencies (if they also require the same package).
+  1. Security check (Use `npm audit fix` to fix vulnerabilities)
+  ```shell
+  npm audit
+  ```
+  1. Update all the packages listed to the latest version (specified by the \fBtag\fR config ⟨/using-npm/config#tag⟩), respecting the semver constraints of both your package and its dependencies (if they also require the same package).
   ```shell
   npm update --save
   ```
-  3. Update package.json to latest versions (🚨 skip this since it does not seem to respect semver constraints)
+  1. Update package.json to latest versions (🚨 skip this since it does not seem to respect semver constraints)
   ```shell
   npx npm-check-updates -u
   ```
-  4. Install with updated versions
+  1. Install with updated versions
   ```shell
   npm install
   ```
-  5. Test your app
+  1. Test your app
   ```shell
   npm test
   ```
-  6. If issues, check peer dependencies
+  1. If issues, check peer dependencies
   ```shell
   npm ls
   ```
