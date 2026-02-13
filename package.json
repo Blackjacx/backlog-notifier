@@ -1,7 +1,7 @@
 {
   "name": "backlog-notifier",
   "description": "Comment on tickets connected to PRs in a teams platform specific repository in the same account about the release of a new PR / feature.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Stefan Herold",
   "private": true,
   "homepage": "https://github.com/Blackjacx/backlog-notifier",
